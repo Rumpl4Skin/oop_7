@@ -1,398 +1,690 @@
 ﻿#include <iostream>
-#include <list>
 #include <string>
-#include <vector>
+#pragma warning(disable : 4996)
 
 using namespace std;
 
-struct book {
-	int regNum;
-	string author;
-	string name;
-	int year;
-	string publisher;
-	int pages;
+template <class T>
+struct Node {
+	T data;
+	Node<T>* next;
+	Node<T>* prev;
 };
 
-struct node
+template<class T>
+class Stack
 {
-	book elem;
-	node* sled;
-	node* pred;
-};
-
-class Circle
-{
-public:
-	node* nsp;
-	node* activElem;
-
-	Circle();
-	Circle(node*);
-	void BuiltRing();
-	void VyvodLeftRight();
-	void Delete(node*);
-	void Ochistka();
-	void IteratorSled();
-	void IteratorPred();
-	node* SearchRing(int);
-	void InsAfter(node*, book);
-
+	template<class T>
 	friend class Iterator;
-	friend class AlgoInsert;
+public:
+	int count;
+	Node<T>* head;
+	Node<T>* tail;
 
-	friend ostream& operator<< (ostream& out, const Circle& stud);
+	Stack();
+	Stack(const T& obj);
+	~Stack();
 
-	Circle& operator ++();
+	void AddHead(T);
+	void AddTail(T);
+	void DeleteHead();
+	void DeleteTail();
+	void show();
+	void ShowCount();
 
+	Iterator<T> begin() { return head; }
+	Iterator<T> end() { return tail; }
 };
 
-class Iterator {
+template<class T>
+class Iterator
+{
+	Stack<T>* q;
+	Node<T>* current;
 public:
-	friend class AlgoInsert;
-	Circle* crl;
-	Iterator(Circle& c) {
-		crl = &c;
-	}
 
-	void IteratorSled()
-	{
-		node* r;
+	Iterator();
+	Iterator(Stack<T>* obj);
 
-		cout << (*((*crl->activElem).sled)).elem.author << (*((*crl->activElem).sled)).elem.name << (*((*crl->activElem).sled)).elem.pages << (*((*crl->activElem).sled)).elem.publisher << (*((*crl->activElem).sled)).elem.regNum << (*((*crl->activElem).sled)).elem.year << endl;
-		crl->activElem = crl->activElem->sled;
-	}
+	bool begin();
+	bool end();
+	bool operator++();
+	bool operator--();
+	bool operator == (T data);
 
-	node* IteratorSld()
-	{
-		crl->activElem = crl->activElem->sled;
-		return  crl->activElem;
-	}
+	T operator *();
 
-	node operator [](int x)
-	{
-		for (int i = 0; i < x - 1; i++) {
-			IteratorSld();
-		}
-		return *IteratorSld();
+	Node<T>* ReturnHead() { return q->head; }
+	Node<T>* ReturnTail() { return q->tail; }
 
-	}
+	void quickSort(Stack<T>* obj);
+	void _quickSort(Node<T>* l, Node<T>* h);
+	void swap(T* a, T* b);
+
+	Node<T>* partition(Node<T>* l, Node<T>* h);
 };
 
-class AlgoInsert {
+template<class T>
+class Algoritm
+{
 public:
-	int data;
-	Circle* crl;
-	AlgoInsert(Circle& c) {
-		crl = &c;
-	}
-	friend class Circle;
-
-	void Count()
+	static void qsort(Node<T>* head, Node<T>* tail)
 	{
-		node* r;
-
-		Iterator itr(*crl);
-
-		int countEl = 0;
-
-		countEl++;
-		r = (*((*crl->nsp).sled)).sled;
-		while (r != (*crl->nsp).sled)
-		{
-			countEl++;
-			r = (*r).sled;
-		}
-		cout << countEl << endl;
-
-		cout << "Количество книг со страницами меньше чем ";
-		int user;
-		cin >> user;
-		int lessThanUser = 0;
-		for (int i = 0; i < countEl; i++) {
-			auto r = itr.IteratorSld();
-			if (r->elem.pages < user) lessThanUser++;
-		}
-		cout << "Элементов меньше " << user << " вот столько - " << lessThanUser << endl;
+		_quickSort(tail, head);
 	}
 
-	void sort()
+	template<typename T>
+	static void _quickSort(Node<T>* l, Node<T>* h)
 	{
-		node* r;
-
-		Iterator itr(*crl);
-
-		int countEl = 0;
-
-		countEl++;
-		r = (*((*crl->nsp).sled)).sled;
-		while (r != (*crl->nsp).sled)
+		if (h != NULL && l != h && l != h->prev)
 		{
-			countEl++;
-			r = (*r).sled;
+			Node<T>* p = partition(l, h);
+			_quickSort(l, p->next);
+			_quickSort(p->prev, h);
 		}
+	}
 
-		for (int i = 0; i < countEl - 1; i++) {
+	template<typename T>
+	static Node<T>* partition(Node<T>* l, Node<T>* h)
+	{
+		auto x = h->data;
+		// similar to i = l-1 for array implementation  
+		auto* i = l->next;
 
-			for (int j = 0; j < countEl - 1; j++) {
-				auto r = itr.IteratorSld();
-				if (r->elem.author > r->sled->elem.author) {
-					auto temp = r->elem;
-					r->elem = r->sled->elem;
-					r->sled->elem = temp;
+		// Similar to "for (int j = l; j <= h- 1; j++)"  
+		for (auto* j = l; j != h; j = j->prev)
+		{
+			if (j->data <= x)
+			{
+				// Similar to i++ for array  
+				i = (i == NULL) ? l : i->prev;
+
+				swap(&(i->data), &(j->data));
+			}
+		}
+		i = (i == NULL) ? l : i->prev; // Similar to i++  
+		swap(&(i->data), &(h->data));
+		return i;
+	}
+
+	template<typename T>
+	static void swap(T* a, T* b)
+	{
+		T temp = *a;
+		*a = *b;
+		*b = temp;
+	}
+
+	static void FindElement(Node<T>* head, Node<T>* tail, string props)
+	{
+		if (head != nullptr)
+		{
+			bool result = false;
+
+			for (auto* j = head; j != tail; j = j->next)
+			{
+				if (j->data == props)
+				{
+					cout << endl << j->data << endl;
+					cout << endl;
+					result = true;
 				}
 			}
-			auto r = itr.IteratorSld();
+
+			if (tail->data == props) {
+				cout << endl << tail->data << endl;
+				cout << endl;
+				result = true;
+			}
+
+			if (result == false)
+				cout << "There is no such Sotrudnik" << endl;
 		}
+		else
+			cout << endl << "The list if empty" << endl;
 	}
 
-	void moveElems()
+	template<typename T>
+	static Node<T>* FindElement2(Node<T>* head, Node<T>* tail, string props)
 	{
-		node* r;
-
-		Iterator itr(*crl);
-
-		int countEl = 0;
-
-		countEl++;
-		r = (*((*crl->nsp).sled)).sled;
-		while (r != (*crl->nsp).sled)
+		if (head != nullptr)
 		{
-			countEl++;
-			r = (*r).sled;
-		}
+			bool result = false;
 
-		int IDLesserThan;
-		cout << "В конец будут перемещены элементы, где ID меньше чем ";
-		cin >> IDLesserThan;
-
-		vector<book> firstPartArr;
-		vector<book> secondPartArr;
-
-		for (int i = 0; i < countEl; i++) {
-			auto r = itr.IteratorSld();
-			if (r->elem.regNum < IDLesserThan) {
-				firstPartArr.push_back(r->elem);
+			for (auto* j = tail; j != head; j = j->prev)
+			{
+				if (j->data == props)
+				{
+					return j;
+				}
 			}
-			else {
-				secondPartArr.push_back(r->elem);
+			Node<T>* j = head;
+			if (result == false)
+			{
+				if (j->data == props)
+				{
+					return j;
+				}
+				else
+				{
+					return NULL;
+					cout << endl << "Not found" << endl;
+				}
 			}
 		}
-
-		for (int i = 0; i < firstPartArr.size; i++) {
-			auto r = itr.IteratorSld();
-			r->elem = firstPartArr[i];
+		else
+		{
+			cout << endl << "The list is empty" << endl;
 		}
-		for (int i = 0; i < secondPartArr.size; i++) {
-			auto r = itr.IteratorSld();
-			r->elem = secondPartArr[i];
-		}
-
 	}
 
+	static void DeleteElement(Node<T>* head, Node<T>* tail, string props)
+	{
+		auto current = head;
 
+		Node<T>* temp = nullptr;
+		Node<T>* findedelement = FindElement2(head, tail, props);
+
+		if (findedelement == tail)
+		{
+			auto temp = findedelement->prev;
+			temp->next = NULL;
+			tail = temp;
+			free(findedelement);
+		}
+		else if (findedelement != nullptr)
+		{
+			Node<T>* prev = findedelement->next;
+			Node<T>* next = findedelement->prev;
+			if (prev != NULL)
+				prev->prev = findedelement->prev;
+			if (next != NULL)
+				next->next = findedelement->next;
+			free(findedelement);
+		}
+	}
 };
 
-Circle::Circle() : nsp(nullptr), activElem(nullptr) {};
-Circle::Circle(node* el) : nsp(el), activElem(el) {};
+class Sotrudnik {
+public:
+	string Name;
+	string Doljn;
+	int staj;
 
-ostream& operator<< (ostream& out, const Circle& uzel)
-{
+	Sotrudnik() { }
 
-	out << "Элементы:" << endl;
-
-	out << (*((*uzel.nsp).sled)).elem.author << " " << (*((*uzel.nsp).sled)).elem.name << " " << (*((*uzel.nsp).sled)).elem.pages << " " << (*((*uzel.nsp).sled)).elem.publisher << " " << (*((*uzel.nsp).sled)).elem.regNum << " " << (*((*uzel.nsp).sled)).elem.year << " " << endl;
-	node* r = (*((*uzel.nsp).sled)).sled;
-	while (r != (*uzel.nsp).sled)
-	{
-		out << (*r).elem.author << " " << (*r).elem.name << " " << (*r).elem.pages << " " << (*r).elem.publisher << " " << (*r).elem.regNum << " " << (*r).elem.year << " " << endl;
-		r = (*r).sled;
+	Sotrudnik(string lName, string pNumber, int y) {
+		Name = lName;
+		Doljn = pNumber;
+		staj = y;
 	}
-	out << endl;
 
+	Sotrudnik(const Sotrudnik& obj) {
+		Name = obj.Name;
+		Doljn = obj.Doljn;
+		staj = obj.staj;
+	}
+
+	Sotrudnik& operator =(const Sotrudnik& obj) {
+		if (&obj != this) {
+			Name = obj.Name;
+			Doljn = obj.Doljn;
+			staj = obj.staj;
+		}
+		return *this;
+	}
+
+	friend bool operator <=(const Sotrudnik& a, const Sotrudnik& b);
+	friend bool operator == (Sotrudnik& obj, string prop);
+	friend bool operator == (Sotrudnik& obj, Sotrudnik& prop);
+	friend bool operator != (Sotrudnik& obj, Sotrudnik& prop);
+
+	friend ostream& operator << (ostream& out, const Sotrudnik& obj);
+	friend istream& operator >> (istream& in, Sotrudnik& obj);
+};
+
+//Implementation of the Stack class
+template<class T>
+Stack<T>::Stack()
+{
+	head = NULL;
+	tail = NULL;
+}
+
+template<class T>
+Stack<T>::Stack(const T& obj)
+{
+	head = new Node<T>;
+	head->data = obj.data;
+	head->next = NULL;
+}
+
+template<class T>
+Stack<T>::~Stack()
+{
+	if (head) {
+		while (head != NULL) {
+			Node<T>* temp = head;
+			head = head->next;
+			delete temp;
+		}
+	}
+}
+
+template<class T>
+void Stack<T>::AddHead(T data)
+{
+	Node<T>* temp = new Node<T>;
+	temp->next = head;
+	temp->data = data;
+	temp->prev = 0;
+
+	if (head != 0)
+		head->prev = temp;
+
+	if (count == 0)
+		head = tail = temp;
+	else
+		head = temp;
+
+	++count;
+}
+
+template<class T>
+void Stack<T>::AddTail(T data)
+{
+	Node<T>* temp = new Node<T>;
+	temp->next = 0;
+	temp->data = data;
+	temp->prev = tail;
+
+	if (tail != 0)
+		tail->next = temp;
+
+	if (count == 0)
+		head = tail = temp;
+	else
+		tail = temp;
+
+	++count;
+}
+
+template<class T>
+void Stack<T>::DeleteTail()
+{
+	try {
+		if (!tail)
+			throw "Stack is empty.";
+
+		Node<T>* temp = tail;
+
+		if (count == 1) {
+			head = tail = NULL;
+			delete temp;
+		}
+		else {
+			tail = tail->prev;
+			tail->next = 0;
+			delete temp;
+		}
+		--count;
+	}
+	catch (char* str) {
+		cout << str << endl;
+	}
+}
+
+template<class T>
+void Stack<T>::DeleteHead()
+{
+	try {
+		if (!head)
+			throw "Stack is empty.";
+
+		Node<T>* temp = head;
+
+		if (count == 1) {
+			head = tail = NULL;
+			delete temp;
+		}
+		else {
+			head = head->next;
+			head->prev = 0;
+			delete temp;
+		}
+		--count;
+	}
+	catch (char* str) {
+		cout << str << endl;
+	}
+}
+
+template<class T>
+void Stack<T>::show()
+{
+	if (head) {
+		if (tail == nullptr)
+		{
+			tail = head;
+		}
+		else if (head == nullptr)
+		{
+			head = tail;
+		}
+
+		Node<T>* temp = head;
+		while (temp->next != NULL)
+		{
+			try
+			{
+				cout << temp->data << endl;
+				temp = temp->next;
+			}
+			catch (const std::exception&)
+			{
+
+			}
+		}
+		cout << temp->data << endl;
+	}
+	else
+		cout << "Stack is empty." << endl;
+
+	cout << endl;
+}
+
+template<class T>
+void Stack<T>::ShowCount()
+{
+	cout << "Count of elements: " << count << endl;
+}
+
+//Implementation of the Iterator class
+template<class T>
+Iterator<T>::Iterator()
+{
+	q = new Stack<T>;
+	current = NULL;
+}
+
+template<class T>
+Iterator<T>::Iterator(Stack<T>* obj)
+{
+	q = obj;
+}
+
+template<class T>
+bool Iterator<T>::begin()
+{
+	if (q->head) {
+		current = q->head;
+		return true;
+	}
+	else
+		return false;
+}
+
+template<class T>
+bool Iterator<T>::end()
+{
+	if (q->tail) {
+		current = q->tail;
+		return true;
+	}
+	else
+		return false;
+}
+
+template<class T>
+bool Iterator<T>::operator++()
+{
+	if (current->next) {
+		current = current->next;
+		return true;
+	}
+	else
+		return false;
+}
+
+template<class T>
+bool Iterator<T>::operator--()
+{
+	if (current->prev) {
+		current = current->prev;
+		return true;
+	}
+	else
+		return false;
+}
+
+template<class T>
+bool Iterator<T>::operator==(T data)
+{
+	if (current->data != data)
+		return true;
+	else
+		return false;
+}
+
+template<class T>
+T Iterator<T>::operator*()
+{
+	if (current)
+		return current->data;
+}
+
+// operator overloading
+bool operator == (Sotrudnik& obj, string prop)
+{
+	if (obj.Name.empty())
+	{
+		return false;
+	}
+
+	char s1[20];
+	itoa(obj.staj, s1, 10);
+
+	if (obj.Name == prop || obj.Doljn == prop || s1 == prop)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool operator == (Sotrudnik& obj, Sotrudnik& prop)
+{
+	if (obj.Name.empty() || prop.Name.empty())
+	{
+		return false;
+	}
+
+	if (obj.Name == prop.Name || obj.Doljn == prop.Doljn || obj.staj == prop.staj)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool operator != (Sotrudnik& obj, Sotrudnik& prop)
+{
+	if (obj.Name.empty() || prop.Name.empty())
+	{
+		return true;
+	}
+
+	if (obj.Name == prop.Name || obj.Doljn == prop.Doljn || obj.staj == prop.staj)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool operator<=(const Sotrudnik& a, const Sotrudnik& b)
+{
+	return a.staj <= b.staj ? true : false;
+}
+
+ostream& operator<<(ostream& out, const Sotrudnik& obj)
+{
+	out << "Name: " << obj.Name << "\nDoljnost: " << obj.Doljn << "\nstaj: " << obj.staj;
 	return out;
 }
 
-void Circle::IteratorSled()
+istream& operator>>(istream& in, Sotrudnik& obj)
 {
-	node* r;
+	flushall();
+	cout << "\nName: ";
+	in >> obj.Name;
 
-	cout << (*((*activElem).sled)).elem.author << " " << (*((*activElem).sled)).elem.name << " " << (*((*activElem).sled)).elem.pages << " " << (*((*activElem).sled)).elem.publisher << " " << (*((*activElem).sled)).elem.regNum << " " << (*((*activElem).sled)).elem.year << endl;
-	activElem = (*activElem).sled;
+	cout << "Doljnost: ";
+	in >> obj.Doljn;
+
+	cout << "Staj: ";
+	in >> obj.staj;
+	return in;
 }
 
-void Circle::IteratorPred()
+int main()
 {
-	node* r;
+	Stack<Sotrudnik>* temp = new Stack<Sotrudnik>;
+	Iterator<Sotrudnik> iter(temp);
 
-	cout << (*((*activElem).pred)).elem.author << " " << (*((*activElem).pred)).elem.name << " " << (*((*activElem).pred)).elem.pages << " " << (*((*activElem).pred)).elem.publisher << " " << (*((*activElem).pred)).elem.regNum << " " << (*((*activElem).pred)).elem.year << endl;
-	activElem = (*activElem).pred;
-}
+	Sotrudnik objSotrudnik;
 
-node* Circle::SearchRing(int el)
-{
-	node* q;
-	node* p;
-	node* Res;
-
-	Res = NULL; p = nsp;
-	if ((*((*p).sled)).elem.regNum == el) Res = (*p).sled;
-	else
-	{
-		q = (*((*p).sled)).sled;
-		while (q != (*p).sled && Res == NULL)
-			if ((*q).elem.regNum == el) Res = q;
-			else  q = (*q).sled;
-	}
-	return Res;
-}
-
-void Circle::InsAfter(node* q, book data)
-{
-	node* insert;
-
-	insert = new(node);
-
-	(*insert).elem = data;
-	(*insert).sled = (*q).sled;
-
-	(*insert).pred = (*(*q).sled).pred;
-
-	(*(*q).sled).pred = insert;
-	(*q).sled = insert;
-}
-
-
-void main()
-{
-	setlocale(LC_ALL, "Russian");
-
-	Circle A;
-
-	book ins;
-	ins.author = "Inserted";
-	ins.name = "book'";
-	ins.pages = 412;
-	ins.publisher = "Ron";
-	ins.regNum = 2000;
-	ins.year = 2015;
-
-	A.BuiltRing();
-	/*auto var = A.SearchRing(4);
-	A.InsAfter(var, ins);*/
-
-	AlgoInsert alIn(A);
-
-	alIn.Count();
-	alIn.sort();
-	cout << "Перегруженный вывод" << endl;
-	cout << A << endl;
-
-	Iterator itr(A);
-	auto dunno = itr[3];
-	cout << dunno.elem.name << endl;
-
-	cout << "Перемещаем элементы" << endl;
-	alIn.moveElems();
-	cout << A << endl;
-
-}
-
-void Circle::BuiltRing()
-{
-	node* re;
-
-	//Построим заглавное звено кольцевого списка.
-	nsp = new(node);
-	re = nsp;
-	(*nsp).pred = NULL;
-	(*nsp).sled = NULL;
-
-	cout << "Вводите книги списка: \n";
-	book el;
-	cout << "Регистрационный номер: \n";
-	cin >> el.regNum;
-	cout << "Название книги: \n";
-	cin >> el.name;
-	cout << "Страниц в книге: \n";
-	cin >> el.pages;
-	cout << "Издатель: \n";
-	cin >> el.publisher;
-	cout << "Автор: \n";
-	cin >> el.author;
-	cout << "Год выпуска: \n";
-	cin >> el.year;
-	cout << endl;
-	while (el.regNum != 0)
-	{
-		(*re).sled = new (node);
-		(*((*re).sled)).pred = re; re = (*re).sled;
-		(*re).sled = NULL; (*re).elem = el;
-
-		cout << "Регистрационный номер: \n";
-		cin >> el.regNum;
-		cout << "Название книги: \n";
-		cin >> el.name;
-		cout << "Страниц в книге: \n";
-		cin >> el.pages;
-		cout << "Издатель: \n";
-		cin >> el.publisher;
-		cout << "Автор: \n";
-		cin >> el.author;
-		cout << "Год выпуска: \n";
-		cin >> el.year;
-		cout << endl;
-	}
-	//А теперь - образуем кольцевой список!
-	if ((*nsp).sled != NULL)
-	{
-		(*((*nsp).sled)).pred = re;
-		(*re).sled = (*nsp).sled;
-		activElem = nsp;
-	}
-	else
-		cout << "Кольцевой список пуст!\n";
-}
-
-void Circle::VyvodLeftRight()
-// Вывод содержимого двунаправленного кольцевого списка
-// с удаленным заглавным звеном "по часовой стрелке".
-// nsp - указатель на заглавное звено списка.
-{
-	node* r;
-
-	cout << "Кольцевой список: ";
-	if ((*nsp).sled != NULL)
-	{
-		cout << (*((*nsp).sled)).elem.author << " " << (*((*nsp).sled)).elem.name << " " << (*((*nsp).sled)).elem.pages << " " << (*((*nsp).sled)).elem.publisher << " " << (*((*nsp).sled)).elem.regNum << " " << (*((*nsp).sled)).elem.year << " " << endl;
-		r = (*((*nsp).sled)).sled;
-		while (r != (*nsp).sled)
+	int choice = 1;
+	cout << "1 - AddHead; 2 - AddTail; 3 - DeleteHead; 4 - DeleteTail; \n5 - Show (iter++); 6 - Show (iter--); 7 - getElement;" << endl;
+	cout << "8 - Sort; 9 - Searching; 10 - Delete" << endl;
+	cout << "\nYour choice: ";
+	cin >> choice;
+	while (choice >= 1 & choice <= 11) {
+		switch (choice)
 		{
-			cout << (*r).elem.author << " " << (*r).elem.name << " " << (*r).elem.pages << " " << (*r).elem.publisher << " " << (*r).elem.regNum << " " << (*r).elem.year << " " << endl;
-			r = (*r).sled;
+		case 1: {
+			cin >> objSotrudnik;
+			temp->AddHead(objSotrudnik);
+			break;
 		}
-		cout << endl;
-	}
-	else cout << "пуст!";
-}
+		case 2: {
+			cin >> objSotrudnik;
+			temp->AddTail(objSotrudnik);
+			break;
+		}
+		case 3: {
+			temp->ShowCount();
+			temp->DeleteHead();
+			temp->ShowCount();
+			break;
+		}
+		case 4: {
+			temp->ShowCount();
+			temp->DeleteTail();
+			temp->ShowCount();
+			break;
+		}
+		case 5: {
+			int count = 0;
 
-void Circle::Delete(node* Res)
-// Удаление из кольцевого двунаправленного списка
-// звена, на которое указывает ссылка Res.
-// nsp - указатель на заглавное звено списка.
-{
-	if ((*Res).sled == Res)
-	{
-		(*nsp).sled = NULL; delete Res;
-	}
-	else
-	{
-		(*(*Res).sled).pred = (*Res).pred;
-		(*(*Res).pred).sled = (*Res).sled;
-		if ((*nsp).sled == Res)
-			// Удаляем "первое" звено кольца.
-			(*nsp).sled = (*Res).sled;
-		delete Res;
+			try {
+				if (iter.begin() != true)
+					throw "Stack is empty.";
+
+				do {
+					cout << count + 1 << " Sotrudnik" << endl;
+					cout << *iter << endl;
+					cout << "\n";
+					++count;
+				} while ((++iter) == true);
+			}
+			catch (char* str) {
+				cout << str << endl;
+			}
+
+			break;
+		}
+		case 6:
+		{
+			int count = temp->count;
+
+			try {
+				if (iter.end() != true)
+					throw "Stack is empty.";
+
+				do {
+					cout << count << " Sotrudnik" << endl;
+					cout << *iter << endl;
+					cout << "\n";
+					--count;
+				} while ((--iter) == true);
+			}
+			catch (char* str) {
+				cout << str << endl;
+			}
+
+			break;
+		}
+		case 7: {
+			int Sotrudnik = 0;
+			cout << "Get sotrudnik: ";
+			cin >> Sotrudnik;
+
+			if (Sotrudnik > temp->count)
+				cout << "Your choise isn't correct." << endl;
+			else {
+				if (iter.begin() == true) {
+					if (Sotrudnik == 1)
+						cout << "\nResult\n" << *iter << endl;
+					else {
+						for (int i = 0; i < Sotrudnik; ++i)
+							++iter;
+
+						cout << "\nResult\n" << *iter << endl;
+					}
+				}
+			}
+			break;
+		}
+		case 8: {
+			cout << "\nThe result of sorting\n" << endl;
+
+			Algoritm<Sotrudnik> example;
+			example.qsort(iter.ReturnHead(), iter.ReturnTail());
+			temp->show();
+			break;
+		}
+		case 9: {
+			string data;
+			Algoritm<Sotrudnik> example;
+
+			cout << "\nEntering the staj: ";
+			cin >> data;
+
+			example.FindElement(iter.ReturnHead(), iter.ReturnTail(), data);
+			break;
+		}
+		case 10: {
+			string data;
+			Algoritm<Sotrudnik> example;
+
+			cout << "\nEntering the staj: ";
+			cin >> data;
+
+			cout << "\nThe result of delete\n" << endl;
+			example.DeleteElement(iter.ReturnHead(), iter.ReturnTail(), data);
+			temp->show();
+
+			break;
+		}
+		}
+		cout << "\nYour choice: ";
+		cin >> choice;
 	}
 }
-
