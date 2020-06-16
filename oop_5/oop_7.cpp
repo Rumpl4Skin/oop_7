@@ -1,10 +1,10 @@
-﻿
+﻿#include <list>
+#include <vector>
 #include <iostream>
 #include <iomanip>
 #include<fstream>
 #include <string>
 #include <deque>
-#include <list>
 
 using namespace std;
 
