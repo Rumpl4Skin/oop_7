@@ -1,690 +1,312 @@
-﻿#include <iostream>
+﻿
+#include <iostream>
+#include <iomanip>
+#include<fstream>
 #include <string>
-#pragma warning(disable : 4996)
+#include <deque>
+#include <list>
 
 using namespace std;
 
-template <class T>
-struct Node {
-	T data;
-	Node<T>* next;
-	Node<T>* prev;
-};
+template<class T>
+T vvod() {
+	for (;;) {
+		try {
+			T n = NULL;
+			if (!(cin >> n)) throw 1;
+			return n;
+		}
+		catch (int) {
+			cin.clear();
+			cin.ignore(32767, '\n');
+			cout << "Error!" << endl;
+		}
+	}
+}
 
 template<class T>
-class Stack
-{
-	template<class T>
-	friend class Iterator;
-public:
-	int count;
-	Node<T>* head;
-	Node<T>* tail;
+T vvod(T i, T j) {
+	for (;;) {
+		try {
+			T n = vvod <int>();
+			if (n < i || n > j) throw 1.5;
+			return n;
 
-	Stack();
-	Stack(const T& obj);
-	~Stack();
-
-	void AddHead(T);
-	void AddTail(T);
-	void DeleteHead();
-	void DeleteTail();
-	void show();
-	void ShowCount();
-
-	Iterator<T> begin() { return head; }
-	Iterator<T> end() { return tail; }
-};
-
-template<class T>
-class Iterator
-{
-	Stack<T>* q;
-	Node<T>* current;
-public:
-
-	Iterator();
-	Iterator(Stack<T>* obj);
-
-	bool begin();
-	bool end();
-	bool operator++();
-	bool operator--();
-	bool operator == (T data);
-
-	T operator *();
-
-	Node<T>* ReturnHead() { return q->head; }
-	Node<T>* ReturnTail() { return q->tail; }
-
-	void quickSort(Stack<T>* obj);
-	void _quickSort(Node<T>* l, Node<T>* h);
-	void swap(T* a, T* b);
-
-	Node<T>* partition(Node<T>* l, Node<T>* h);
-};
-
-template<class T>
-class Algoritm
-{
-public:
-	static void qsort(Node<T>* head, Node<T>* tail)
-	{
-		_quickSort(tail, head);
-	}
-
-	template<typename T>
-	static void _quickSort(Node<T>* l, Node<T>* h)
-	{
-		if (h != NULL && l != h && l != h->prev)
-		{
-			Node<T>* p = partition(l, h);
-			_quickSort(l, p->next);
-			_quickSort(p->prev, h);
+		}
+		catch (double) {
+			cin.clear();
+			cin.ignore(32767, '\n');
+			cout << "Err" << i << " до " << j << endl;
 		}
 	}
-
-	template<typename T>
-	static Node<T>* partition(Node<T>* l, Node<T>* h)
-	{
-		auto x = h->data;
-		// similar to i = l-1 for array implementation  
-		auto* i = l->next;
-
-		// Similar to "for (int j = l; j <= h- 1; j++)"  
-		for (auto* j = l; j != h; j = j->prev)
-		{
-			if (j->data <= x)
-			{
-				// Similar to i++ for array  
-				i = (i == NULL) ? l : i->prev;
-
-				swap(&(i->data), &(j->data));
-			}
-		}
-		i = (i == NULL) ? l : i->prev; // Similar to i++  
-		swap(&(i->data), &(h->data));
-		return i;
-	}
-
-	template<typename T>
-	static void swap(T* a, T* b)
-	{
-		T temp = *a;
-		*a = *b;
-		*b = temp;
-	}
-
-	static void FindElement(Node<T>* head, Node<T>* tail, string props)
-	{
-		if (head != nullptr)
-		{
-			bool result = false;
-
-			for (auto* j = head; j != tail; j = j->next)
-			{
-				if (j->data == props)
-				{
-					cout << endl << j->data << endl;
-					cout << endl;
-					result = true;
-				}
-			}
-
-			if (tail->data == props) {
-				cout << endl << tail->data << endl;
-				cout << endl;
-				result = true;
-			}
-
-			if (result == false)
-				cout << "There is no such Sotrudnik" << endl;
-		}
-		else
-			cout << endl << "The list if empty" << endl;
-	}
-
-	template<typename T>
-	static Node<T>* FindElement2(Node<T>* head, Node<T>* tail, string props)
-	{
-		if (head != nullptr)
-		{
-			bool result = false;
-
-			for (auto* j = tail; j != head; j = j->prev)
-			{
-				if (j->data == props)
-				{
-					return j;
-				}
-			}
-			Node<T>* j = head;
-			if (result == false)
-			{
-				if (j->data == props)
-				{
-					return j;
-				}
-				else
-				{
-					return NULL;
-					cout << endl << "Not found" << endl;
-				}
-			}
-		}
-		else
-		{
-			cout << endl << "The list is empty" << endl;
-		}
-	}
-
-	static void DeleteElement(Node<T>* head, Node<T>* tail, string props)
-	{
-		auto current = head;
-
-		Node<T>* temp = nullptr;
-		Node<T>* findedelement = FindElement2(head, tail, props);
-
-		if (findedelement == tail)
-		{
-			auto temp = findedelement->prev;
-			temp->next = NULL;
-			tail = temp;
-			free(findedelement);
-		}
-		else if (findedelement != nullptr)
-		{
-			Node<T>* prev = findedelement->next;
-			Node<T>* next = findedelement->prev;
-			if (prev != NULL)
-				prev->prev = findedelement->prev;
-			if (next != NULL)
-				next->next = findedelement->next;
-			free(findedelement);
-		}
-	}
-};
+}
 
 class Sotrudnik {
+private:
+	char Name[100];
+	char Doljn[100];
+	int Staj;
 public:
-	string Name;
-	string Doljn;
-	int staj;
-
-	Sotrudnik() { }
-
-	Sotrudnik(string lName, string pNumber, int y) {
-		Name = lName;
-		Doljn = pNumber;
-		staj = y;
-	}
-
-	Sotrudnik(const Sotrudnik& obj) {
-		Name = obj.Name;
-		Doljn = obj.Doljn;
-		staj = obj.staj;
-	}
-
-	Sotrudnik& operator =(const Sotrudnik& obj) {
-		if (&obj != this) {
-			Name = obj.Name;
-			Doljn = obj.Doljn;
-			staj = obj.staj;
-		}
-		return *this;
-	}
-
-	friend bool operator <=(const Sotrudnik& a, const Sotrudnik& b);
-	friend bool operator == (Sotrudnik& obj, string prop);
-	friend bool operator == (Sotrudnik& obj, Sotrudnik& prop);
-	friend bool operator != (Sotrudnik& obj, Sotrudnik& prop);
-
-	friend ostream& operator << (ostream& out, const Sotrudnik& obj);
-	friend istream& operator >> (istream& in, Sotrudnik& obj);
+	Sotrudnik() {};
+	void in(char NAME[100], char Doljn[100], int Staj);
+	friend ostream& operator<< (ostream &out, const Sotrudnik &sotr);
+	bool operator <(Sotrudnik &sotr);
+	bool operator >(Sotrudnik &sotr);
+	void operator =(Sotrudnik &sotr);
+	friend bool operator==(const Sotrudnik &st, char* &gr);
+	char* getName();
+	char* getDoljn();
+	int getStaj();;
 };
 
-//Implementation of the Stack class
-template<class T>
-Stack<T>::Stack()
+
+void Sotrudnik::in(char NAME[100], char Doljn[100], int Staj)
 {
-	head = NULL;
-	tail = NULL;
+	strcpy_s(this->Name, NAME);
+	strcpy_s(this->Doljn, Doljn);
+	this->Staj = Staj;
+}
+char* Sotrudnik::getName()
+{
+	return Name;
 }
 
-template<class T>
-Stack<T>::Stack(const T& obj)
+char* Sotrudnik::getDoljn()
 {
-	head = new Node<T>;
-	head->data = obj.data;
-	head->next = NULL;
+	return Doljn;
 }
 
-template<class T>
-Stack<T>::~Stack()
+int Sotrudnik::getStaj()
 {
-	if (head) {
-		while (head != NULL) {
-			Node<T>* temp = head;
-			head = head->next;
-			delete temp;
-		}
-	}
+	return Staj;
 }
 
-template<class T>
-void Stack<T>::AddHead(T data)
+bool Sotrudnik::operator<(Sotrudnik &pr)
 {
-	Node<T>* temp = new Node<T>;
-	temp->next = head;
-	temp->data = data;
-	temp->prev = 0;
-
-	if (head != 0)
-		head->prev = temp;
-
-	if (count == 0)
-		head = tail = temp;
-	else
-		head = temp;
-
-	++count;
-}
-
-template<class T>
-void Stack<T>::AddTail(T data)
-{
-	Node<T>* temp = new Node<T>;
-	temp->next = 0;
-	temp->data = data;
-	temp->prev = tail;
-
-	if (tail != 0)
-		tail->next = temp;
-
-	if (count == 0)
-		head = tail = temp;
-	else
-		tail = temp;
-
-	++count;
-}
-
-template<class T>
-void Stack<T>::DeleteTail()
-{
-	try {
-		if (!tail)
-			throw "Stack is empty.";
-
-		Node<T>* temp = tail;
-
-		if (count == 1) {
-			head = tail = NULL;
-			delete temp;
-		}
-		else {
-			tail = tail->prev;
-			tail->next = 0;
-			delete temp;
-		}
-		--count;
-	}
-	catch (char* str) {
-		cout << str << endl;
-	}
-}
-
-template<class T>
-void Stack<T>::DeleteHead()
-{
-	try {
-		if (!head)
-			throw "Stack is empty.";
-
-		Node<T>* temp = head;
-
-		if (count == 1) {
-			head = tail = NULL;
-			delete temp;
-		}
-		else {
-			head = head->next;
-			head->prev = 0;
-			delete temp;
-		}
-		--count;
-	}
-	catch (char* str) {
-		cout << str << endl;
-	}
-}
-
-template<class T>
-void Stack<T>::show()
-{
-	if (head) {
-		if (tail == nullptr)
-		{
-			tail = head;
-		}
-		else if (head == nullptr)
-		{
-			head = tail;
-		}
-
-		Node<T>* temp = head;
-		while (temp->next != NULL)
-		{
-			try
-			{
-				cout << temp->data << endl;
-				temp = temp->next;
-			}
-			catch (const std::exception&)
-			{
-
-			}
-		}
-		cout << temp->data << endl;
-	}
-	else
-		cout << "Stack is empty." << endl;
-
-	cout << endl;
-}
-
-template<class T>
-void Stack<T>::ShowCount()
-{
-	cout << "Count of elements: " << count << endl;
-}
-
-//Implementation of the Iterator class
-template<class T>
-Iterator<T>::Iterator()
-{
-	q = new Stack<T>;
-	current = NULL;
-}
-
-template<class T>
-Iterator<T>::Iterator(Stack<T>* obj)
-{
-	q = obj;
-}
-
-template<class T>
-bool Iterator<T>::begin()
-{
-	if (q->head) {
-		current = q->head;
+	char f[100];
+	strcpy_s(f, pr.getName());
+	if ((int)Name[0] < (int)f[0])
 		return true;
-	}
-	else
-		return false;
+	else return false;
 }
 
-template<class T>
-bool Iterator<T>::end()
+bool Sotrudnik::operator>(Sotrudnik &pr)
 {
-	if (q->tail) {
-		current = q->tail;
+	char f[100];
+	strcpy_s(f, pr.getName());
+	if ((int)Name[0] > (int)f[0])
 		return true;
-	}
-	else
-		return false;
+	else return false;
 }
 
-template<class T>
-bool Iterator<T>::operator++()
+void Sotrudnik::operator=(Sotrudnik &pr)
 {
-	if (current->next) {
-		current = current->next;
+	strcpy_s(this->Name, pr.getName());
+	strcpy_s(this->Doljn, pr.getDoljn());
+	this->Staj = pr.getStaj();
+}
+
+bool operator==(const Sotrudnik &sotr, char* &gr) {
+	if (strcmp(sotr.Name, gr) == 0)
 		return true;
-	}
-	else
-		return false;
+	else return false;
 }
 
-template<class T>
-bool Iterator<T>::operator--()
+ostream& operator<< (ostream &out, const Sotrudnik &sotr)
 {
-	if (current->prev) {
-		current = current->prev;
-		return true;
-	}
-	else
-		return false;
-}
-
-template<class T>
-bool Iterator<T>::operator==(T data)
-{
-	if (current->data != data)
-		return true;
-	else
-		return false;
-}
-
-template<class T>
-T Iterator<T>::operator*()
-{
-	if (current)
-		return current->data;
-}
-
-// operator overloading
-bool operator == (Sotrudnik& obj, string prop)
-{
-	if (obj.Name.empty())
-	{
-		return false;
-	}
-
-	char s1[20];
-	itoa(obj.staj, s1, 10);
-
-	if (obj.Name == prop || obj.Doljn == prop || s1 == prop)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool operator == (Sotrudnik& obj, Sotrudnik& prop)
-{
-	if (obj.Name.empty() || prop.Name.empty())
-	{
-		return false;
-	}
-
-	if (obj.Name == prop.Name || obj.Doljn == prop.Doljn || obj.staj == prop.staj)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool operator != (Sotrudnik& obj, Sotrudnik& prop)
-{
-	if (obj.Name.empty() || prop.Name.empty())
-	{
-		return true;
-	}
-
-	if (obj.Name == prop.Name || obj.Doljn == prop.Doljn || obj.staj == prop.staj)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
-bool operator<=(const Sotrudnik& a, const Sotrudnik& b)
-{
-	return a.staj <= b.staj ? true : false;
-}
-
-ostream& operator<<(ostream& out, const Sotrudnik& obj)
-{
-	out << "Name: " << obj.Name << "\nDoljnost: " << obj.Doljn << "\nstaj: " << obj.staj;
+	out << "Имя:" << endl;
+	out << sotr.Name << endl;
+	out << "Должность:" << endl;
+	out << sotr.Doljn << endl;
+	out << "Стаж:" << endl;
+	out << sotr.Staj << " ";
 	return out;
 }
 
-istream& operator>>(istream& in, Sotrudnik& obj)
+//template <class T>
+//void quickSort(int left, int right, deque<T> &itr);
+//
+//template <class T>
+//void find(deque<T> &deq, char* group);
+//
+//template <class T>
+//void del(deque<T> &deq, char* group);
+
+class Algoritm
 {
-	flushall();
-	cout << "\nName: ";
-	in >> obj.Name;
+public:
+	Algoritm();
+	~Algoritm();
+	template <class T>
+	void quickSort(int left, int right, deque<T> &deq) {
+		int l = left, r = right;
+		T mid = deq[(r + l) / 2], help;
+		while (l < r) {
+			while (deq[l] < mid)
+			{
+				l++;
+			}
+			while (deq[r] > mid)
+			{
+				r--;
+			}
+			if (l <= r) {
+				help = deq[l];
+				deq[l] = deq[r];
+				deq[r] = help;
+				l++; r--;
+			}
+		}
+		if (left < r)
+			quickSort(left, r, deq);
+		if (l < right)
+			quickSort(l, right, deq);
+	}
 
-	cout << "Doljnost: ";
-	in >> obj.Doljn;
+	template <class T>
+	void find(deque<T> &deq, char* group) {
+		deque<Sotrudnik>::const_iterator itr_b = deq.begin();
+		deque<Sotrudnik>::const_iterator itr_e = deq.end();
+		bool fl = true;
+		while (itr_b != itr_e) {
+			if (*itr_b == group)
+			{
+				cout << *itr_b << endl;
+				fl = false;
+				break;
+			}
+			itr_b++;
+		}
+		if (fl) throw 1;
+	}
 
-	cout << "Staj: ";
-	in >> obj.staj;
-	return in;
+	template <class T>
+	void del(deque<T> &deq, char* group) {
+		deque<Sotrudnik>::iterator itr_b = deq.begin();
+		deque<Sotrudnik>::iterator itr;
+
+		bool fl = true;
+		while (itr_b != deq.end()) {
+			if (*itr_b == group)
+			{
+				for (itr = itr_b; itr != deq.end() - 1; itr++) {
+					*itr = *(itr + 1);
+				}
+				deq.pop_back();
+			}
+			itr_b++;
+		}
+	}
+
+};
+
+Algoritm::Algoritm()
+{
+}
+
+Algoritm::~Algoritm()
+{
 }
 
 int main()
 {
-	Stack<Sotrudnik>* temp = new Stack<Sotrudnik>;
-	Iterator<Sotrudnik> iter(temp);
-
-	Sotrudnik objSotrudnik;
-
-	int choice = 1;
-	cout << "1 - AddHead; 2 - AddTail; 3 - DeleteHead; 4 - DeleteTail; \n5 - Show (iter++); 6 - Show (iter--); 7 - getElement;" << endl;
-	cout << "8 - Sort; 9 - Searching; 10 - Delete" << endl;
-	cout << "\nYour choice: ";
-	cin >> choice;
-	while (choice >= 1 & choice <= 11) {
-		switch (choice)
+	setlocale(LC_ALL, "Russian");
+	cout << "Введите количество Сотрудников:" << endl;
+	int n = vvod<int>();
+	deque<Sotrudnik> deq;
+	Sotrudnik sotr;
+	char Name[100];
+	char Doljn[100];
+	int Staj;
+	Algoritm al;
+	for (int i = 0; i < n; i++) {
+		cout << "Введите Имя: " << endl;
+		cin.ignore();
+		cin.getline(Name, 100);
+		cout << "Введите должность: " << endl;
+		cin.ignore();
+		cin.getline(Doljn, 100);
+		cout << "Введите стаж: " << endl;
+		Staj = vvod<int>();
+		sotr.in(Name, Doljn, Staj);
+		deq.push_back(sotr);
+	}
+	int ch = 0;
+	while (ch != 7)
+	{
+		cout << "1. Вывести список Сотрудников" << endl;
+		cout << "2. Вывести список Сотрудников в обратном порядке" << endl;
+		cout << "3. Сортировать список Сотрудников" << endl;
+		cout << "4. Просмотреть информацию о Сотрудниках" << endl;
+		cout << "5. Найти сотрудника" << endl;
+		cout << "6. Удалить сотрудника" << endl;
+		cout << "7. Выход" << endl;
+		cout << "Выбор меню:" << endl;
+		ch = vvod<int>(1, 7);
+		switch (ch)
 		{
-		case 1: {
-			cin >> objSotrudnik;
-			temp->AddHead(objSotrudnik);
-			break;
-		}
-		case 2: {
-			cin >> objSotrudnik;
-			temp->AddTail(objSotrudnik);
-			break;
-		}
-		case 3: {
-			temp->ShowCount();
-			temp->DeleteHead();
-			temp->ShowCount();
-			break;
-		}
-		case 4: {
-			temp->ShowCount();
-			temp->DeleteTail();
-			temp->ShowCount();
-			break;
-		}
-		case 5: {
-			int count = 0;
-
-			try {
-				if (iter.begin() != true)
-					throw "Stack is empty.";
-
-				do {
-					cout << count + 1 << " Sotrudnik" << endl;
-					cout << *iter << endl;
-					cout << "\n";
-					++count;
-				} while ((++iter) == true);
+		case 1:
+		{
+			deque<Sotrudnik>::const_iterator pt;
+			if (deq.empty()) {
+				cout << "Список пуст" << endl;
 			}
-			catch (char* str) {
-				cout << str << endl;
+			cout << "Количество Сотрудников: " << deq.size() << endl;
+			for (pt = deq.begin(); pt != deq.end(); pt++)
+				cout << *pt << endl;
+		}
+		break;
+		case 2:
+		{
+			deque<Sotrudnik>::reverse_iterator pt;
+			if (deq.empty()) {
+				cout << "Список пуст" << endl;
 			}
-
-			break;
+			cout << "Количество Сотрудников: " << deq.size() << endl;
+			for (pt = deq.rbegin(); pt != deq.rend(); pt++)
+				cout << *pt << endl;
+		}
+		break;
+		case 3:
+		{
+			al.quickSort(0, deq.size() - 1, deq);
+			cout << "   Отсортировано!" << endl;
+		}
+		break;
+		case 4:
+		{
+			cout << "Введите порядковый Сотрудников:" << endl;
+			int num = vvod<int>() - 1;
+			cout << deq[num] << endl;
+		}
+		break;
+		case 5:
+		{
+			try
+			{
+				cout << "Введите имя: " << endl;
+				cin.ignore();
+				cin.getline(Name, 100);
+				al.find(deq, Name);
+			}
+			catch (int)
+			{
+				cout << "Совпадений не найдено" << endl;
+			}
 		}
 		case 6:
 		{
-			int count = temp->count;
-
-			try {
-				if (iter.end() != true)
-					throw "Stack is empty.";
-
-				do {
-					cout << count << " Sotrudnik" << endl;
-					cout << *iter << endl;
-					cout << "\n";
-					--count;
-				} while ((--iter) == true);
-			}
-			catch (char* str) {
-				cout << str << endl;
-			}
-
+			cout << "Введите имя: " << endl;
+			cin.ignore();
+			cin.getline(Name, 10);
+			al.del(deq, Name);
+		}
+		case 7:
+			break;
+		default:
+			cout << "Err" << endl;
 			break;
 		}
-		case 7: {
-			int Sotrudnik = 0;
-			cout << "Get sotrudnik: ";
-			cin >> Sotrudnik;
-
-			if (Sotrudnik > temp->count)
-				cout << "Your choise isn't correct." << endl;
-			else {
-				if (iter.begin() == true) {
-					if (Sotrudnik == 1)
-						cout << "\nResult\n" << *iter << endl;
-					else {
-						for (int i = 0; i < Sotrudnik; ++i)
-							++iter;
-
-						cout << "\nResult\n" << *iter << endl;
-					}
-				}
-			}
-			break;
-		}
-		case 8: {
-			cout << "\nThe result of sorting\n" << endl;
-
-			Algoritm<Sotrudnik> example;
-			example.qsort(iter.ReturnHead(), iter.ReturnTail());
-			temp->show();
-			break;
-		}
-		case 9: {
-			string data;
-			Algoritm<Sotrudnik> example;
-
-			cout << "\nEntering the staj: ";
-			cin >> data;
-
-			example.FindElement(iter.ReturnHead(), iter.ReturnTail(), data);
-			break;
-		}
-		case 10: {
-			string data;
-			Algoritm<Sotrudnik> example;
-
-			cout << "\nEntering the staj: ";
-			cin >> data;
-
-			cout << "\nThe result of delete\n" << endl;
-			example.DeleteElement(iter.ReturnHead(), iter.ReturnTail(), data);
-			temp->show();
-
-			break;
-		}
-		}
-		cout << "\nYour choice: ";
-		cin >> choice;
 	}
+	return 0;
 }
